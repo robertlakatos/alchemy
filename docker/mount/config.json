@@ -3,8 +3,10 @@
         {"role": "system", "content": "Egy segítőkész és tisztelettudó szenzoros rendszert támogató asszisztens vagy aki a következő instrukciók alapján mindig formálist stílusban válaszol a felhasználók kérdéseire. \nA kérdések megválaszolásához ne írj python vagy más programozási nyelvben kódot.\nA kérdések megválaszolásánál mindig figyelembe veszed a rendelkezésedre álló JSON adatokat, amely a szenzorok mérési eredményeit tartalmazzák _óra_, _átlag_, _év_, _hónap_, _nap_ jellemzőkkel. \nAz egyes jellemzők pontos leírása a következő:\n_átlag _ : Megadja az adott mérési ponthoz tartozó átlagos prátartalom értékét %-ban. \n_év_ : Megadja hogy az _átlag_ jellemzőhöz tartozó páratartalom érték melyik évben került megmérésre, rögzítésre. \n_hónap_ : Megadja hogy az _átlag_ jellemzőhöz tartozó páratartalom érték az adott év melyik hónapjában került megmérésre, rögzítésre.\n_nap_ : Megadja hogy az _átlag_ jellemzőhöz tartozó páratartalom érték az adott év adott hónapjának melyik napján került megmérésre, rögzítésre.\n_óra_ : Megadja hogy az _átlag_ jellemzőhöz tartozó páratartalom érték az adott napon belül mikor, hány órakor lett megmérve. \n_dátum_ : Megadja hogy az _átlag_ jellemzőhöz tartozó páratartalom mikor került, rögzítésre év.hónap.nap óra formátumban. \nKérdésekre mindig rövid és tömör választ adsz.\n"}
     ],
     "guard" : {
-        "reduce_max_position_embeddings" : 1000,
+        "reduce_max_position_embeddings" : 5000,
+        "max_history_items" : 3,
         "no information" : "Sajnálom erre a kérdésre nem áll rendelkezésemre információ.",
+        "server error" : "Sajnálom ismeretlen hiba történt.",
         "reinforce" : " Csak a kérdésre válaszolj! Ne magyarázd a válaszod és ne sorolj fel részadatokat de teljes mondatban válaszolj!"
     },
     "tokenizer" : "meta-llama/Llama-3.1-8b-instruct",
@@ -21,7 +23,7 @@
         "max_tokens": 512,
         "temperature": 1.0
     },
-    "sources" : "../data/sensors/",
+    "sources" : "mount/",
     "filters" : {
         "treshold" : 0.5,
         "reference questions" : [
@@ -34,7 +36,8 @@
             "Milyen az átlagos páratartalom a helyiségben a mai napon?",
             "Milyen páratartalomra kell számítani a következő órában?",
             "Hogyan viszonyul az aktuális páratartalom a küszöbértékekhez?",
-            "Van-e szükség a páratartalom szabályozására a jelenlegi állapot alapján?"
+            "Van-e szükség a páratartalom szabályozására a jelenlegi állapot alapján?",
+            "Köszönöm."
         ]
     }
 }

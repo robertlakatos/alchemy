@@ -1,12 +1,13 @@
 import json
 
-# Object(s)
-with open('config.json', 'r') as file:
-    config = json.load(file)
+DATA = None
+SORUCES = None
 
-with open(f"{config['sources']}/total.json", 'r') as file:
-    data = json.load(file)
-print("LOADED\t\t\t: data")
+def load_data(sources):
+    SORUCES = sources
+    with open(f"{SORUCES}/total.json", 'r') as file:
+        DATA = json.load(file)
+    print("SEMANTIC SEARCH ENGINE\t: ready")
 
 def get_contexts(question=""):
-    return f"Páratartalom adatai (JSON):{str(data)}\n\n"
+    return f"Páratartalom adatai (JSON):{str(DATA)}\n\n"

@@ -1,0 +1,8 @@
+version: '3.9'
+
+services:
+  python_app:
+    build: .
+    volumes:
+      - ./mount:/app/mount  # A helyi config könyvtár csatolása a konténerhez
+    restart: always  # Automatikus újraindítás, ha a konténer leáll
