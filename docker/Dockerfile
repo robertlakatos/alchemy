@@ -4,13 +4,6 @@ FROM python:3.9.20
 # Szükséges csomagok telepítése
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-# RUN pip install --no-cache-dir numpy
-# RUN pip install --no-cache-dir pandas
-# RUN pip install --no-cache-dir torch
-# RUN pip install --no-cache-dir torchvision
-# RUN pip install --no-cache-dir transformers
-# RUN pip install --no-cache-dir sentence-transformers
-# RUN pip install  --no-cache-dir -U "huggingface_hub[cli]"
 
 # Külső könyvtár felcsatolásához
 VOLUME /alchemy/codes/mount
