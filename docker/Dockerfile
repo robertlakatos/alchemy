@@ -32,8 +32,8 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /alchemy/codes
 
 # Parancs a Python program futtatásához
-# CMD ["tail", "-f", "/dev/null"]
-CMD ["sh", "-c", "python server.py >> /alchemy/logs/alchemy.log 2>&1"]
+CMD ["tail", "-f", "/dev/null"]
+# CMD ["sh", "-c", "python server.py >> /alchemy/logs/alchemy.log 2>&1"]
 
 # Port kiadása
 EXPOSE 20249
