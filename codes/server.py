@@ -53,10 +53,14 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
             print(f"CONNECTION READY: {client_address}")
 
             ### Üzenet fogadása a kliens felől
-            message = client_socket.recv(1024).decode('utf-8')
-            print(f"MESSAGE FROM CLIENT: {message}")
-            message = json.loads(message)
-            
+            try:
+                message = client_socket.recv(1000000).decode('utf-8')
+                print(f"MESSAGE FROM CLIENT: {message}")
+                message = json.loads(message)
+            except:
+                print("ERROR\t\t\t: TO LONG MESSAGE!")
+                continue
+
             ### Alap chat beállítása
             chat = config["chat history"].copy()
 
@@ -69,44 +73,37 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
 
             ### Ha a kérdés megfelelő. Tehát arra kérdez amire a modell válaszolhat.
             print("SERVER RESPONSE:")
-            if helper.question_checker(question=message[-1]["content"], 
-                                        refq=config["filters"]["reference questions"], 
-                                        treshold=config["filters"]["treshold"], 
-                                        model=model_st):
+            
+            #### Új kérdés hozzáadása
+            chat.append(message[-1])
 
-                #### Új kérdés hozzáadása
-                chat.append(message[-1])
+            #### megerősítés hozzáadása
+            chat[-1]["content"] = chat[-1]["content"] + config["guard"]["reinforce"]
+            
+            #### Üzenet létrehozzása limit határon belül
+            reduced_message = helper.reduce_message(chat, limit_pe, config["guard"]["max_history_items"], tokenizer)
+            print(f"MESSAGE TO MODEL: {reduced_message[:25]}...")
 
-                #### megerősítés hozzáadása
-                chat[-1]["content"] = chat[-1]["content"] + config["guard"]["reinforce"]
-                
-                #### Üzenet létrehozzása limit határon belül
-                reduced_message = helper.reduce_message(chat, limit_pe, config["guard"]["max_history_items"], tokenizer)
-                print(f"MESSAGE TO MODEL: {reduced_message[:25]}...")
+            #### Triton kérés összeállítása
+            payload = {
+                "text_input": reduced_message,
+                "max_tokens": config['triton']['max_tokens'],
+                "temperature": config['triton']['temperature'],
+                "stream": ("stream" in config['triton']['generation'])
+            }
 
-                #### Triton kérés összeállítása
-                payload = {
-                    "text_input": reduced_message,
-                    "max_tokens": config['triton']['max_tokens'],
-                    "temperature": config['triton']['temperature'],
-                    "stream": ("stream" in config['triton']['generation'])
-                }
-
-                #### Kérelem küldése Triton szerverhez és stream feldolgozása
-                with requests.post(url, json=payload, stream=True) as response:
-                    if response.status_code == 200:
-                        for line in response.iter_lines():
-                            if line:
-                                batch = json.loads(line.decode('utf-8').replace("data: ", ""))
-                                ##### Válaszból kitisztitjuk a templétet jelölő karaktereket.
-                                if helper.cleaning_stream(batch):
-                                    ###### Stream válasz küldése a kliens felé
-                                    client_socket.sendall(batch['text_output'].encode('utf-8'))
-                    else:
-                        error_message = f"ERROR MESSAGE: {response.status_code}"
-                        print(error_message)
-                        print(config["guard"]["server error"])
-                        client_socket.sendall(config["guard"]["server error"].encode('utf-8'))
-            else:
-                print(config["guard"]["no information"])
-                client_socket.sendall(config["guard"]["no information"].encode('utf-8'))
+            #### Kérelem küldése Triton szerverhez és stream feldolgozása
+            with requests.post(url, json=payload, stream=True) as response:
+                if response.status_code == 200:
+                    for line in response.iter_lines():
+                        if line:
+                            batch = json.loads(line.decode('utf-8').replace("data: ", ""))
+                            ##### Válaszból kitisztitjuk a templétet jelölő karaktereket.
+                            if helper.cleaning_stream(batch):
+                                ###### Stream válasz küldése a kliens felé
+                                client_socket.sendall(batch['text_output'].encode('utf-8'))
+                else:
+                    error_message = f"ERROR MESSAGE: {response.status_code}"
+                    print(error_message)
+                    print(config["guard"]["server error"])
+                    client_socket.sendall(config["guard"]["server error"].encode('utf-8'))
