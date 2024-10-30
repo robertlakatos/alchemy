@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y git
 RUN git clone https://github.com/robertlakatos/alchemy.git
 
 # Huggingface token beállítása
-RUN huggingface-cli login --token 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 --add-to-git-credential
+RUN huggingface-cli login --token hf_**** --add-to-git-credential
 
 # Log könyvtár létrehozása
 RUN mkdir -p /alchemy/logs
