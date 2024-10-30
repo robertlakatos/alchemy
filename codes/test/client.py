@@ -17,9 +17,16 @@ while True:
     else:
         history.append({"role": "user", "content": question})
         # print(history)
+        
+        # Host beállítása
+        if config["bridge"]["host"] == "0.0.0.0":
+            host = "127.0.0.1"
+        else:
+            host = config["bridge"]["host"]
+        
         # Kliens kapcsolat létrehozása és kérés küldése
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-            client_socket.connect((config["bridge"]["host"], config["bridge"]["port"]))
+            client_socket.connect((host, config["bridge"]["port"]))
             message = json.dumps(history, ensure_ascii=False)
             # print(f"Küldés a szervernek: {question}")
             

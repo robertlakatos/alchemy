@@ -15,7 +15,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # Object(s)
 
 # Konfig fájl betöltése
-with open('mount/config.json', 'r', encoding='utf-8') as file:
+with open('./mount/config.json', 'r', encoding='utf-8') as file:
     config = json.load(file)
 print("LOADED\t\t\t: config")
 
